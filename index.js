@@ -28,10 +28,22 @@ let idCounter = 0;
 
 wss.on('connection', (ws) => {
   // Add to list of connected clients
+  console.debug('New client connected');
   ws.id = idCounter++;
   clients.push(ws);
 
-  ws.on('message', (message) => {
+  ws.on('message', (messageBuffer) => {
+    // Parse message as JSON
+    let message;
+    try {
+      message = JSON.parse(messageBuffer);
+    } catch (e) {
+      console.error('Failed to parse message', messageBuffer);
+      return;
+    }
+
+    console.debug('Message received', message);
+
     switch (message.type) {
       case 'SET_NAME':
         // Set name on the socket
@@ -39,26 +51,36 @@ wss.on('connection', (ws) => {
 
         // Notify other clients
         clients.forEach((client) =>
-          client.send({
-            type: 'USER_JOIN',
-            value: message.value
-          })
+          client.send(
+            JSON.stringify({
+              type: 'USER_JOIN',
+              value: message.value
+            })
+          )
         );
         break;
 
       case 'MESSAGE_SEND':
         // Send out to all clients
         clients.forEach((client) =>
-          client.send({
-            type: 'MESSAGE_RECEIVE',
-            value: message.value
-          })
+          client.send(
+            JSON.stringify({
+              type: 'MESSAGE_RECEIVE',
+              value: message.value,
+              sender: ws.name
+            })
+          )
         );
         break;
+
+      default:
+        console.debug('Unknown message type', message.type);
     }
   });
 
   ws.on('close', () => {
+    console.debug('Client closed connection', ws.id, ws.name);
+
     // Remove from client list
     clients.splice(
       clients.findIndex((client) => client.id === ws.id),
@@ -68,10 +90,12 @@ wss.on('connection', (ws) => {
     // Notify other clients
     if (ws.name) {
       clients.forEach((client) =>
-        client.send({
-          type: 'USER_LEAVE',
-          value: ws.name
-        })
+        client.send(
+          JSON.stringify({
+            type: 'USER_LEAVE',
+            value: ws.name
+          })
+        )
       );
     }
   });
