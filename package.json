@@ -4,5 +4,11 @@
   "main": "index.js",
   "repository": "https://github.com/alexking-and/websockets-talk-api.git",
   "author": "Alex King <alex.king@and.digital>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.14.2"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
 }
