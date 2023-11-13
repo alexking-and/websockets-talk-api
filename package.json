@@ -1,0 +1,8 @@
+{
+  "name": "websockets-talk-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/alexking-and/websockets-talk-api.git",
+  "author": "Alex King <alex.king@and.digital>",
+  "license": "MIT"
+}
