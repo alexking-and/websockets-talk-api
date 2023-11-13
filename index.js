@@ -41,7 +41,6 @@ wss.on('connection', (ws) => {
       console.error('Failed to parse message', messageBuffer);
       return;
     }
-
     console.debug('Message received', message);
 
     switch (message.type) {
@@ -61,7 +60,7 @@ wss.on('connection', (ws) => {
         break;
 
       case 'MESSAGE_SEND':
-        // Send out to all clients
+        // Send out to all clients with sender's name
         clients.forEach((client) =>
           client.send(
             JSON.stringify({

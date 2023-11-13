@@ -5,10 +5,14 @@
   "repository": "https://github.com/alexking-and/websockets-talk-api.git",
   "author": "Alex King <alex.king@and.digital>",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "watch": "nodemon index.js"
+  },
   "dependencies": {
     "ws": "^8.14.2"
   },
-  "scripts": {
-    "start": "node index.js"
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
