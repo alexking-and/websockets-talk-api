@@ -1,0 +1,7 @@
+.qr-code-container {
+    text-align: center;
+}
+
+.qr-code {
+    max-width: 300px;
+}

@@ -1,0 +1,13 @@
+.outer-container {
+  display: flex;
+  justify-content: center;
+}
+
+.inner-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+}
