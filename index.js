@@ -1,36 +1,32 @@
 const fs = require('fs');
+const http = require('http');
 const https = require('https');
 const WebSocket = require('ws');
+const express = require('express');
 
-/* Config */
+const app = express();
 
-const port = process.env.PORT || 8080;
-const wssConfig = {};
-let httpsServer;
+let server;
 if (process.env.USE_HTTPS_SERVER === 'true') {
-  httpsServer = https.createServer({
-    cert: fs.readFileSync('server.crt'),
-    key: fs.readFileSync('server.key')
-  });
-  wssConfig.server = httpsServer;
+  server = https.createServer(
+    {
+      cert: fs.readFileSync('server.crt'),
+      key: fs.readFileSync('server.key')
+    },
+    app
+  );
 } else {
-  wssConfig.port = port;
+  server = http.createServer(app);
 }
 
-const wss = new WebSocket.Server(wssConfig);
+const wss = new WebSocket.Server({ server });
 
-/* Global vars */
+app.use(express.static('./client/build'));
 
-const clients = [];
-let idCounter = 0;
-
-/* WebSockets */
+const socketIsActive = (client) => client.readyState === WebSocket.OPEN;
 
 wss.on('connection', (ws) => {
-  // Add to list of connected clients
   console.debug('New client connected');
-  ws.id = idCounter++;
-  clients.push(ws);
 
   ws.on('message', (messageBuffer) => {
     // Parse message as JSON
@@ -49,27 +45,31 @@ wss.on('connection', (ws) => {
         ws.name = message.value;
 
         // Notify other clients
-        clients.forEach((client) =>
-          client.send(
-            JSON.stringify({
-              type: 'USER_JOIN',
-              value: message.value
-            })
-          )
-        );
+        wss.clients.forEach((client) => {
+          if (socketIsActive(client)) {
+            client.send(
+              JSON.stringify({
+                type: 'USER_JOIN',
+                value: message.value
+              })
+            );
+          }
+        });
         break;
 
       case 'MESSAGE_SEND':
         // Send out to all clients with sender's name
-        clients.forEach((client) =>
-          client.send(
-            JSON.stringify({
-              type: 'MESSAGE_RECEIVE',
-              value: message.value,
-              sender: ws.name
-            })
-          )
-        );
+        wss.clients.forEach((client) => {
+          if (socketIsActive(client)) {
+            client.send(
+              JSON.stringify({
+                type: 'MESSAGE_RECEIVE',
+                value: message.value,
+                sender: ws.name
+              })
+            );
+          }
+        });
         break;
 
       default:
@@ -78,30 +78,23 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    console.debug('Client closed connection', ws.id, ws.name);
-
-    // Remove from client list
-    clients.splice(
-      clients.findIndex((client) => client.id === ws.id),
-      1
-    );
+    console.debug('Client closed connection', ws.name);
 
     // Notify other clients
     if (ws.name) {
-      clients.forEach((client) =>
-        client.send(
-          JSON.stringify({
-            type: 'USER_LEAVE',
-            value: ws.name
-          })
-        )
-      );
+      wss.clients.forEach((client) => {
+        if (socketIsActive(client)) {
+          client.send(
+            JSON.stringify({
+              type: 'USER_LEAVE',
+              value: ws.name
+            })
+          );
+        }
+      });
     }
   });
 });
 
-if (httpsServer) {
-  httpsServer.listen(port);
-}
-
-console.debug(`Server started on port ${port}`);
+const port = process.env.PORT || 3000;
+server.listen(port, () => console.log(`Server started on port ${port}`));

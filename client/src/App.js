@@ -2,15 +2,17 @@ import { useState } from 'react';
 import './App.css';
 import NameForm from './components/NameForm/NameForm';
 
-const PROTOCOL = process.env.REACT_APP_USE_WSS === 'true' ? 'wss' : 'ws';
-const HOST = process.env.REACT_APP_API_HOST;
+const WS_PROTOCOL = process.env.REACT_APP_USE_WSS === 'true' ? 'wss' : 'ws';
 
 const App = () => {
-  const [ws, setWs] = useState(null);
+  const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [showLandingForm, setShowLandingForm] = useState(true);
 
-  const connectToServer = (name) => {
-    const ws = new WebSocket(`${PROTOCOL}://${HOST}`);
+  const connectToServer = (e, name) => {
+    e.preventDefault();
+    console.log('Opening connection');
+    const ws = new WebSocket(`${WS_PROTOCOL}://${window.location.host}`);
 
     ws.onopen = () => {
       console.log('Connection opened');
@@ -20,6 +22,7 @@ const App = () => {
           value: name
         })
       );
+      setShowLandingForm(false);
     };
 
     ws.onmessage = (e) => {
@@ -32,11 +35,11 @@ const App = () => {
       console.log('Connection closed');
     };
 
-    setWs(ws);
+    setSocket(ws);
   };
 
   const sendMessage = (message) => {
-    ws.send(
+    socket.send(
       JSON.stringify({
         type: 'MESSAGE_SEND',
         value: message
@@ -47,7 +50,7 @@ const App = () => {
   return (
     <div className="outer-container">
       <div className="inner-container">
-        <NameForm onSubmit={connectToServer} />
+        {showLandingForm ? <NameForm onSubmit={connectToServer} /> : messages.map((message) => <p>{message.value}</p>)}
       </div>
     </div>
   );
