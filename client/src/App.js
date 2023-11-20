@@ -3,7 +3,7 @@ import './App.css';
 import Chat from './components/Chat/Chat';
 import NameForm from './components/NameForm/NameForm';
 
-const WS_PROTOCOL = process.env.REACT_APP_USE_WSS === 'true' ? 'wss' : 'ws';
+const WS_PROTOCOL = process.env.REACT_APP_USE_WSS === 'false' ? 'ws' : 'wss';
 
 const App = () => {
   const [socket, setSocket] = useState(null);

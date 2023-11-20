@@ -16,17 +16,13 @@ const Chat = ({ messages, sendMessage }) => {
   };
 
   const handleScroll = () => {
-    console.log('handling scroll');
     const node = messagesContainerRef.current;
     const isScrolledUp = node.scrollTop + 200 < node.scrollHeight - node.clientHeight;
     setShouldScrollBottom(!isScrolledUp);
   };
 
   useEffect(() => {
-    console.log('useEffect hit');
-    console.log('shouldScrollBottom', shouldScrollBottom);
     if (shouldScrollBottom) {
-      console.log('scrolling bottom');
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [shouldScrollBottom, messages]);
