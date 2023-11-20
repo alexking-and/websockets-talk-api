@@ -11,6 +11,11 @@ const Chat = ({ messages, sendMessage }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!messageToSend.length) {
+      return;
+    }
+
     sendMessage(messageToSend);
     setMessageToSend('');
   };
