@@ -6,7 +6,8 @@ import './Chat.css';
 
 const Chat = ({ messages, sendMessage }) => {
   const [messageToSend, setMessageToSend] = useState('');
-  const messagesEndRef = useRef(null);
+  const [shouldScrollBottom, setShouldScrollBottom] = useState(true);
+  const messagesContainerRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,22 +15,25 @@ const Chat = ({ messages, sendMessage }) => {
     setMessageToSend('');
   };
 
+  const handleScroll = () => {
+    console.log('handling scroll');
+    const node = messagesContainerRef.current;
+    const isScrolledUp = node.scrollTop + 200 < node.scrollHeight - node.clientHeight;
+    setShouldScrollBottom(!isScrolledUp);
+  };
+
   useEffect(() => {
     console.log('useEffect hit');
-    const node = messagesEndRef.current;
-
-    if (node) {
-      console.log('node', node.scrollTop, node.scrollHeight);
+    console.log('shouldScrollBottom', shouldScrollBottom);
+    if (shouldScrollBottom) {
+      console.log('scrolling bottom');
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
-
-    if (node && node.scrollTop !== 0) {
-      node.scrollTop = node.scrollHeight;
-    }
-  }, [messagesEndRef]);
+  }, [shouldScrollBottom, messages]);
 
   return (
     <div className="chat-container">
-      <div className="messages-container" ref={messagesEndRef}>
+      <div className="messages-container" ref={messagesContainerRef} onScroll={handleScroll}>
         {messages.map((message) => (
           <ChatMessage {...message} />
         ))}
