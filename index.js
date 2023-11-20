@@ -34,10 +34,10 @@ wss.on('connection', (ws) => {
     try {
       message = JSON.parse(messageBuffer);
     } catch (e) {
-      console.error('Failed to parse message', messageBuffer);
+      console.error('Failed to parse message:', messageBuffer);
       return;
     }
-    console.debug('Message received', message);
+    console.debug('Message received:', message);
 
     switch (message.type) {
       case 'SET_NAME':
@@ -50,7 +50,7 @@ wss.on('connection', (ws) => {
             client.send(
               JSON.stringify({
                 type: 'USER_JOIN',
-                value: message.value
+                sender: ws.name
               })
             );
           }
@@ -73,12 +73,12 @@ wss.on('connection', (ws) => {
         break;
 
       default:
-        console.debug('Unknown message type', message.type);
+        console.debug('Unknown message type:', message.type);
     }
   });
 
   ws.on('close', () => {
-    console.debug('Client closed connection', ws.name);
+    console.debug('Client closed connection:', ws.name);
 
     // Notify other clients
     if (ws.name) {
@@ -87,7 +87,7 @@ wss.on('connection', (ws) => {
           client.send(
             JSON.stringify({
               type: 'USER_LEAVE',
-              value: ws.name
+              sender: ws.name
             })
           );
         }

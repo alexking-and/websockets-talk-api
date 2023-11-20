@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './App.css';
+import Chat from './components/Chat/Chat';
 import NameForm from './components/NameForm/NameForm';
 
 const WS_PROTOCOL = process.env.REACT_APP_USE_WSS === 'true' ? 'wss' : 'ws';
@@ -50,7 +51,11 @@ const App = () => {
   return (
     <div className="outer-container">
       <div className="inner-container">
-        {showLandingForm ? <NameForm onSubmit={connectToServer} /> : messages.map((message) => <p>{message.value}</p>)}
+        {showLandingForm ? (
+          <NameForm onSubmit={connectToServer} />
+        ) : (
+          <Chat messages={messages} sendMessage={sendMessage} />
+        )}
       </div>
     </div>
   );

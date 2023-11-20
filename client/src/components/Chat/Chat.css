@@ -4,12 +4,22 @@
     width: 100%;
     flex-direction: column;
     justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 5vh;
+    padding-top: 5vh;
 }
 
 .messages-container {
     overflow-y: scroll;
     display: flex;
+    flex-direction: column;
+    height: 100%;
     width: 100%;
     gap: 8px;
     flex-wrap: nowrap;
+}
+
+.input-container form {
+    display: flex;
+    gap: 8px;
 }

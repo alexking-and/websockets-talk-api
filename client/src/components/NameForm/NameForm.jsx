@@ -8,7 +8,7 @@ const NameForm = ({ onSubmit }) => {
   const url = `${window.location.protocol}//${window.location.host}`;
 
   return (
-    <>
+    <div className="name-form-container">
       <div className="qr-code-container">
         <img src={qrCode} alt="QR code" className="qr-code" />
         <h3>
@@ -24,7 +24,7 @@ const NameForm = ({ onSubmit }) => {
         <br />
         <Button type="submit">Enter Chat</Button>
       </Form>
-    </>
+    </div>
   );
 };
 
